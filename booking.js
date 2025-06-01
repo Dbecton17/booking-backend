@@ -17,7 +17,7 @@ router.post('/webhook', async (req, res) => {
     const session = event.data.object;
     console.log('✅ Payment received:', session);
 
-    // Later: Call Google Calendar API to create an event
+    // TODO: Add Google Calendar event creation here
   }
 
   res.status(200).send('Webhook received');
