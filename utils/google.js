@@ -8,8 +8,9 @@ const oauth2Client = new google.auth.OAuth2(
 
 // 🔐 You’ll add a token here manually for now
 oauth2Client.setCredentials({
-  refresh_token: 'your_google_refresh_token_here'
+  refresh_token: process.env.GOOGLE_REFRESH_TOKEN
 });
+
 
 const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
