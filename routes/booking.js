@@ -21,99 +21,33 @@ const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
  * Returns available 30-minute time slots for the next 7 days between 10am–5pm
  */
 router.get('/available-slots', async (req, res) => {
-  try {
-    const now = new Date();
-    const oneWeekLater = new Date();
-    oneWeekLater.setDate(now.getDate() + 7);
+  const fixedSlot = {
+    start: new Date('2025-06-08T17:00:00-05:00').toISOString(),
+    end: new Date('2025-06-08T19:00:00-05:00').toISOString(),
+  };
 
+  try {
     const events = await calendar.events.list({
       calendarId: 'primary',
-      timeMin: now.toISOString(),
-      timeMax: oneWeekLater.toISOString(),
+      timeMin: fixedSlot.start,
+      timeMax: fixedSlot.end,
       singleEvents: true,
       orderBy: 'startTime',
     });
 
-    const booked = events.data.items.map((e) => ({
-      start: new Date(e.start.dateTime),
-      end: new Date(e.end.dateTime),
-    }));
+    const count = events.data.items.length;
 
-    const available = [];
-    for (let day = 0; day < 7; day++) {
-      const date = new Date(now);
-      date.setDate(date.getDate() + day);
-
-      for (let hour = 10; hour < 17; hour++) {
-        const start = new Date(date);
-        start.setHours(hour, 0, 0, 0);
-        const end = new Date(start);
-        end.setMinutes(start.getMinutes() + 30);
-
-        const conflict = booked.some(
-          (e) => start < e.end && end > e.start
-        );
-
-        if (!conflict && start > now) {
-          available.push({ start: start.toISOString(), end: end.toISOString() });
-        }
-      }
+    if (count >= 10) {
+      return res.json([]); // fully booked
     }
 
-    res.json(available);
+    res.json([fixedSlot]);
   } catch (err) {
-    console.error('Error fetching slots:', err);
-    res.status(500).json({ error: 'Failed to fetch available slots' });
+    console.error('Error checking group slot:', err);
+    res.status(500).json({ error: 'Failed to fetch slot' });
   }
 });
 
-/**
- * POST /book-slot
- * Creates a calendar event and returns a Stripe Checkout session
- */
-router.post('/book-slot', async (req, res) => {
-  const { name, email, slot } = req.body;
-
-  try {
-    // Create calendar event
-    await calendar.events.insert({
-      calendarId: 'primary',
-      requestBody: {
-        summary: `Booking: ${name}`,
-        description: `Booked by ${email}`,
-        start: { dateTime: slot.start },
-        end: { dateTime: slot.end },
-        attendees: [{ email }],
-      },
-    });
-
-    // Create Stripe Checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      customer_email: email,
-      mode: 'payment',
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: '30-Minute Booking',
-            },
-            unit_amount: 5000, // $50
-          },
-          quantity: 1,
-        },
-      ],
-      success_url: 'https://yourdomain.com/success',
-      cancel_url: 'https://yourdomain.com/cancel',
-    });
-
-    res.json({ url: session.url });
-  } catch (err) {
-    console.error('Booking error:', err);
-    res.status(500).json({ error: 'Booking failed' });
-  }
-});
 
 /**
  * POST /webhook
