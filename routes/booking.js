@@ -22,8 +22,8 @@ const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
  */
 router.get('/available-slots', async (req, res) => {
   const fixedSlot = {
-    start: new Date('2025-06-08T17:00:00-05:00').toISOString(),
-    end: new Date('2025-06-08T19:00:00-05:00').toISOString(),
+    start: new Date('2025-06-08T16:00:00-05:00').toISOString(), // 4:00 PM
+    end: new Date('2025-06-08T18:00:00-05:00').toISOString(),   // 6:00 PM
   };
 
   try {
@@ -47,6 +47,7 @@ router.get('/available-slots', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch slot' });
   }
 });
+
 
 
 /**
