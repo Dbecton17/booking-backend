@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.raw({ type: 'application/json' }));
 
 const bookingRoutes = require('./routes/booking');
-app.use('/', bookingRoutes);
+app.use('/api', bookingRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
