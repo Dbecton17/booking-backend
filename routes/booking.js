@@ -48,7 +48,7 @@ const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
  * GET /available-slots
  * Returns available 30-minute time slots for the next 7 days between 10am–5pm
  */
-router.get('/available-slots', async (req, res) => {
+router.get('/api/available-slots', async (req, res) => {
   const fixedSlot = {
     start: new Date('2025-06-08T16:00:00-05:00').toISOString(), // 4:00 PM
     end: new Date('2025-06-08T18:00:00-05:00').toISOString(),   // 6:00 PM
@@ -82,7 +82,7 @@ router.get('/available-slots', async (req, res) => {
  * POST /webhook
  * Handles Stripe webhook for completed payments
  */
-router.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+router.post('/api/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   let event;
   try {
     const sig = req.headers['stripe-signature'];
