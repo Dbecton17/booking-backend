@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-router.post('/api/create-checkout-session', async (req, res) => {
+router.post('/create-checkout-session', async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -82,7 +82,7 @@ router.get('/available-slots', async (req, res) => {
  * POST /webhook
  * Handles Stripe webhook for completed payments
  */
-router.post('/api/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+router.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   let event;
   try {
     const sig = req.headers['stripe-signature'];
