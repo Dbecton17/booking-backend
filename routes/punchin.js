@@ -19,10 +19,10 @@ const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
 // Define Punch In Showcase booking slot times
 const punchInSlots = [
-  { day: 1, start: "18:00", end: "20:00" }, // Monday
-  { day: 3, start: "18:00", end: "20:00" }, // Wednesday
-  { day: 4, start: "18:00", end: "20:00" }, // Thursday
-  { day: 0, start: "11:00", end: "14:00" }  // Sunday
+  { day: 1, start: "23:00", end: "01:00" }, // Monday
+  { day: 3, start: "23:00", end: "01:00" }, // Wednesday
+  { day: 4, start: "23:00", end: "01:00" }, // Thursday
+  { day: 0, start: "16:00", end: "19:00" }  // Sunday
 ];
 
 function getNextSlots() {
