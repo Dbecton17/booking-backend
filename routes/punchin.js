@@ -17,43 +17,38 @@ oauth2Client.setCredentials({
 
 const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
-// Define Punch In Showcase booking slot times
+const { DateTime } = require("luxon"); // Only if backend — for frontend use CDN
+
 const punchInSlots = [
-  { day: 1, start: "23:00", end: "01:00" }, // Monday
-  { day: 3, start: "23:00", end: "01:00" }, // Wednesday
-  { day: 4, start: "23:00", end: "01:00" }, // Thursday
-  { day: 0, start: "16:00", end: "19:00" }  // Sunday
+  { day: 1, start: "18:00", end: "20:00" }, // Monday
+  { day: 3, start: "18:00", end: "20:00" }, // Wednesday
+  { day: 4, start: "18:00", end: "20:00" }, // Thursday
+  { day: 0, start: "11:00", end: "14:00" }  // Sunday
 ];
 
-function getNextSlots() {
+function generateSlots() {
+  const now = DateTime.now().setZone("America/Chicago");
   const slots = [];
-  const now = new Date();
-  for (let i = 0; i < 14; i++) {
-    const date = new Date(now);
-    date.setDate(date.getDate() + i);
-    const day = date.getDay();
-    const slotDef = punchInSlots.find(s => s.day === day);
-    if (!slotDef) continue;
 
-    const [startHour, startMin] = slotDef.start.split(":").map(Number);
-    const [endHour, endMin] = slotDef.end.split(":").map(Number);
+  for (let i = 0; i < 7; i++) {
+    const day = now.plus({ days: i });
+    const dayOfWeek = day.weekday % 7; // Sunday = 0, Monday = 1, etc.
 
-    for (let time = startHour; time < endHour; time += 0.5) {
-      const start = new Date(date);
-      start.setHours(Math.floor(time), (time % 1) * 60, 0, 0);
-
-      const end = new Date(start);
-      end.setMinutes(end.getMinutes() + 30);
+    const matchingSlot = punchInSlots.find(s => s.day === dayOfWeek);
+    if (matchingSlot) {
+      const start = DateTime.fromFormat(`${day.toISODate()} ${matchingSlot.start}`, 'yyyy-MM-dd HH:mm', { zone: 'America/Chicago' });
+      const end = DateTime.fromFormat(`${day.toISODate()} ${matchingSlot.end}`, 'yyyy-MM-dd HH:mm', { zone: 'America/Chicago' });
 
       slots.push({
-        start: start.toISOString(),
-        end: end.toISOString()
+        start: start.toUTC().toISO(),
+        end: end.toUTC().toISO()
       });
     }
   }
 
   return slots;
 }
+
 
 router.get('/api/punchin/available-slots', async (req, res) => {
   try {
