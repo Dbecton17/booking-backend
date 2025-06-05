@@ -28,6 +28,8 @@ const punchInSlots = [
 function getNextSlots() {
   const slots = [];
   const now = new Date();
+  const minimumTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now
+
   for (let i = 0; i < 14; i++) {
     const date = new Date(now);
     date.setDate(date.getDate() + i);
@@ -42,6 +44,9 @@ function getNextSlots() {
       const start = new Date(date);
       start.setHours(Math.floor(time), (time % 1) * 60, 0, 0);
 
+      // Skip if start time is less than 24 hours ahead
+      if (start < minimumTime) continue;
+
       const end = new Date(start);
       end.setMinutes(end.getMinutes() + 30);
 
@@ -54,6 +59,7 @@ function getNextSlots() {
 
   return slots;
 }
+
 
 router.get('/api/punchin/available-slots', async (req, res) => {
   try {
