@@ -50,8 +50,8 @@ const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
  */
 router.get('/available-slots', async (req, res) => {
   const fixedSlot = {
-    start: new Date('2025-06-08T16:00:00-05:00').toISOString(), // 4:00 PM
-    end: new Date('2025-06-08T18:00:00-05:00').toISOString(),   // 6:00 PM
+    start: new Date('2025-07-13T16:00:00-05:00').toISOString(), // 4:00 PM
+    end: new Date('2025-07-13T18:00:00-05:00').toISOString(),   // 6:00 PM
   };
 
   try {
